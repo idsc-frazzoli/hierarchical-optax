@@ -49,6 +49,7 @@ from optax._src.alias import radam
 from optax._src.alias import rmsprop
 from optax._src.alias import rprop
 from optax._src.alias import sgd
+from optax._src.alias import lex
 from optax._src.alias import sm3
 from optax._src.alias import yogi
 from optax._src.base import EmptyState
@@ -90,7 +91,9 @@ from optax._src.linear_algebra import global_norm
 from optax._src.linear_algebra import matrix_inverse_pth_root
 from optax._src.linear_algebra import power_iteration
 from optax._src.linesearch import scale_by_backtracking_linesearch
+# from optax._src.linesearch import exact_linesearch
 from optax._src.linesearch import ScaleByBacktrackingLinesearchState
+from optax._src.lexicographic import lex_wrap
 from optax._src.lookahead import lookahead
 from optax._src.lookahead import LookaheadParams
 from optax._src.lookahead import LookaheadState
@@ -386,6 +389,7 @@ __all__ = (
     "scale_by_adamax",
     "scale_by_amsgrad",
     "scale_by_backtracking_linesearch",
+    "exact_linesearch",
     "scale_by_belief",
     "scale_by_lion",
     "scale_by_factored_rms",
@@ -422,6 +426,7 @@ __all__ = (
     "Schedule",
     "set_to_zero",
     "sgd",
+    "lex",
     "sgdr_schedule",
     "ShouldSkipUpdateFunction",
     "sigmoid_binary_cross_entropy",

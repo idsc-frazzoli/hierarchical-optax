@@ -23,6 +23,7 @@ from optax._src import base
 from optax._src import clipping
 from optax._src import combine
 from optax._src import factorized
+from optax._src import lexicographic
 from optax._src import transform
 from optax._src import wrappers
 
@@ -1471,6 +1472,38 @@ def sgd(
        if momentum is not None else base.identity()),
       transform.scale_by_learning_rate(learning_rate)
   )
+
+def lex(
+    chained_algs: base.GradientTransformation, 
+    rules, # TODO - should this be a pytree?
+    fun: Optional[Callable] = None,
+    l0: float = 10
+):
+  r"""A lexicographic optimizer. 
+
+  Uses the algorithms in chained_args to solve for the objective function fun taking into consideration of the rules. This is does via the representation: 
+  .. math::
+
+  \begin{align*}
+    R(x) = f(x) + \sum_{i=0}^N \lambda^{N-i} r_i(x)
+  \end{align*}
+
+  Args:
+    chained_algs: contains the desired algorithms used to solve the problem (e.g., sgd, adam, back_tracking_line_search, etc...)
+    rules: contains the ordered rules to consider lexicographically in the optimization. 
+    fun: The objective function f(x) to solve for. It is optional in the case that this is embedded in the rules.
+
+  Returns:
+    The corresponding `GradientTransformation`.
+  """
+
+  def fn(params):
+    lambda_array = [l0**(len(rules)-i) for i in range(len(rules))]
+    if fun is None:
+      return sum(l * f(params) for f, l in zip(rules, lambda_array))
+    return sum(l * f(params) for f, l in zip(rules, lambda_array)) + fun(params)
+
+  return combine.chain(lexicographic.lex_wrap(fn, chained_algs))
 
 
 def sm3(
